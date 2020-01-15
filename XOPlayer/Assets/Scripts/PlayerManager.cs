@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
-#else
-using System.Runtime.InteropServices;
 #endif
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,10 +24,6 @@ public class PlayerManager : MonoBehaviour
         kPanoramic360,
     }
 
-#if !UNITY_EDITOR
-    [DllImport("user32.dll")]
-    private static extern void OpenFileDialog();
-#endif
     private VideoPlayer mPlayer;
     private RenderTexture mVideoTexture;
     private PlayMode mMode = PlayMode.kNormal;
