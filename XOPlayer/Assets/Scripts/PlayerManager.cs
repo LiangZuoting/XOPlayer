@@ -11,11 +11,17 @@ public class PlayerManager : MonoBehaviour
 {
     public GameObject noFileBar;
     public GameObject toolBar;
+    public GameObject playBtn;
+    public GameObject pauseBtn;
+    public GameObject stopBtn;
     public Camera mainCamera;
     public GameObject normalPlayer;
     public Material video2DMaterial;
     public Material videoPanoramicMaterial;
-    public Slider slider;
+    public Slider progressSlider;
+    public GameObject volumeBar;
+    public Slider volumeSlider;
+    public GameObject modePanel;
 
     enum PlayMode
     {
@@ -33,7 +39,11 @@ public class PlayerManager : MonoBehaviour
     void Start()
     {
         toolBar.SetActive(false);
+        modePanel.SetActive(false);
+        volumeBar.SetActive(false);
         mPlayer = GetComponent<VideoPlayer>();
+        mPlayer.SetDirectAudioVolume(0, 0.5f);
+        volumeSlider.value = 0.5f;
         mPlayer.prepareCompleted += onPrepareCompleted;
         mPlayer.loopPointReached += onLoopPointReached;
     }
@@ -44,11 +54,11 @@ public class PlayerManager : MonoBehaviour
         mIgnoreValueChanged = true;
         if (mPlayer.length <= 0)
         {
-            slider.value = 0;
+            progressSlider.value = 0;
         }
         else
         {
-            slider.value = (float)(mPlayer.time / mPlayer.length);
+            progressSlider.value = (float)(mPlayer.time / mPlayer.length);
         }
         mIgnoreValueChanged = false;
 
@@ -85,19 +95,8 @@ public class PlayerManager : MonoBehaviour
 
     public void OnSwitchMode()
     {
-        switch (mMode)
-        {
-            case PlayMode.kNormal:
-                mMode = PlayMode.kPanoramic180;
-                break;
-            case PlayMode.kPanoramic180:
-                mMode = PlayMode.kPanoramic360;
-                break;
-            case PlayMode.kPanoramic360:
-                mMode = PlayMode.kNormal;
-                break;
-        }
-        applyMode();
+        volumeBar.SetActive(false);
+        modePanel.SetActive(!modePanel.activeSelf);
     }
 
     private void applyMode()
@@ -133,6 +132,8 @@ public class PlayerManager : MonoBehaviour
     private void onPrepareCompleted(VideoPlayer videoPlayer)
     {
         toolBar.SetActive(true);
+        playBtn.SetActive(false);
+        pauseBtn.SetActive(true);
         mVideoTexture = new RenderTexture((int)mPlayer.width, (int)mPlayer.height, 0, RenderTextureFormat.ARGB32);
         mPlayer.targetTexture = mVideoTexture;
         applyMode();
@@ -149,7 +150,83 @@ public class PlayerManager : MonoBehaviour
     {
         if (mPlayer.isPlaying && !mIgnoreValueChanged)
         {
-            mPlayer.time = mPlayer.length * slider.value;
+            mPlayer.time = mPlayer.length * progressSlider.value;
+        }
+    }
+
+    public void OnVolumeChanged()
+    {
+        mPlayer.SetDirectAudioVolume(0, volumeSlider.value);
+    }
+
+    public void OnBtn2D()
+    {
+        mMode = PlayMode.kNormal;
+        applyMode();
+        modePanel.SetActive(false);
+    }
+
+    public void OnBtn180()
+    {
+        mMode = PlayMode.kPanoramic180;
+        applyMode();
+        modePanel.SetActive(false);
+    }
+
+    public void OnBtn360()
+    {
+        mMode = PlayMode.kPanoramic360;
+        applyMode();
+        modePanel.SetActive(false);
+    }
+
+    public void OnResume()
+    {
+        if (mPlayer.isPrepared)
+        {
+            playBtn.SetActive(false);
+            pauseBtn.SetActive(true);
+            mPlayer.Play();
+        }
+        else
+        {
+            OnOpenFile();
+        }
+    }
+
+    public void OnPause()
+    {
+        playBtn.SetActive(true);
+        pauseBtn.SetActive(false);
+        mPlayer.Pause();
+    }
+
+    public void OnStop()
+    {
+        noFileBar.SetActive(true);
+        toolBar.SetActive(false);
+        playBtn.SetActive(true);
+        pauseBtn.SetActive(false);
+        mPlayer.Stop();
+        // 1.将画面重置为蓝色背景
+        // 2.kNormal模式下，重置是必要的，否则重新打开一个文件后，画面不会更新。
+        normalPlayer.GetComponent<Image>().material = null;
+        RenderSettings.skybox = null;
+    }
+
+    public void OnVolume()
+    {
+        modePanel.SetActive(false);
+        volumeBar.SetActive(!volumeBar.activeSelf);
+    }
+
+    public void OnPointerUp()
+    {
+        if (mPlayer.isPrepared)
+        {
+            modePanel.SetActive(false);
+            volumeBar.SetActive(false);
+            toolBar.SetActive(!toolBar.activeSelf);
         }
     }
 }
