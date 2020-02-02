@@ -64,7 +64,7 @@ public class PlayerManager : MonoBehaviour
 
         if (mMode != PlayMode.kNormal && Input.GetMouseButton(0))
         {
-            mainCamera.gameObject.GetComponent<CameraManager>().RotateAround();
+            mainCamera.GetComponent<CameraManager>().RotateAround();
         }
     }
 
