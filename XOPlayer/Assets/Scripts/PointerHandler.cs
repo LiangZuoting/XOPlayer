@@ -9,12 +9,10 @@ public class PointerHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        //Debug.Log("mousedown");
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        //Debug.Log("mouseup");
         playerManager.OnPointerUp();
     }
 }
