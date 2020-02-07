@@ -44,8 +44,8 @@ public class PlayerManager : MonoBehaviour
         mPlayer = GetComponent<VideoPlayer>();
         mPlayer.SetDirectAudioVolume(0, 0.5f);
         volumeSlider.value = 0.5f;
-        mPlayer.prepareCompleted += onPrepareCompleted;
-        mPlayer.loopPointReached += onLoopPointReached;
+        mPlayer.prepareCompleted += OnPrepareCompleted;
+        mPlayer.loopPointReached += OnLoopPointReached;
     }
 
     // Update is called once per frame
@@ -99,7 +99,7 @@ public class PlayerManager : MonoBehaviour
         modePanel.SetActive(!modePanel.activeSelf);
     }
 
-    private void applyMode()
+    private void ApplyMode()
     {
         if (mMode == PlayMode.kNormal)
         {
@@ -129,18 +129,18 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void onPrepareCompleted(VideoPlayer videoPlayer)
+    private void OnPrepareCompleted(VideoPlayer videoPlayer)
     {
         toolBar.SetActive(true);
         playBtn.SetActive(false);
         pauseBtn.SetActive(true);
         mVideoTexture = new RenderTexture((int)mPlayer.width, (int)mPlayer.height, 0, RenderTextureFormat.ARGB32);
         mPlayer.targetTexture = mVideoTexture;
-        applyMode();
+        ApplyMode();
         mPlayer.Play();
     }
 
-    private void onLoopPointReached(VideoPlayer videoPlayer)
+    private void OnLoopPointReached(VideoPlayer videoPlayer)
     {
         toolBar.SetActive(false);
         noFileBar.SetActive(true);
@@ -162,21 +162,21 @@ public class PlayerManager : MonoBehaviour
     public void OnBtn2D()
     {
         mMode = PlayMode.kNormal;
-        applyMode();
+        ApplyMode();
         modePanel.SetActive(false);
     }
 
     public void OnBtn180()
     {
         mMode = PlayMode.kPanoramic180;
-        applyMode();
+        ApplyMode();
         modePanel.SetActive(false);
     }
 
     public void OnBtn360()
     {
         mMode = PlayMode.kPanoramic360;
-        applyMode();
+        ApplyMode();
         modePanel.SetActive(false);
     }
 
